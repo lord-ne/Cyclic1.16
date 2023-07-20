@@ -138,7 +138,12 @@ public abstract class TileEntityBase extends TileEntity implements IInventory {
   }
 
   public static ActionResultType leftClickBlock(final WeakReference<FakePlayer> fakePlayerWeakReference,
-      final BlockPos targetPos, final Direction facing) {
+                                                final BlockPos targetPos, final Direction facing) {
+    return leftClickBlock(fakePlayerWeakReference, targetPos, facing, false);
+  }
+
+  public static ActionResultType leftClickBlock(final WeakReference<FakePlayer> fakePlayerWeakReference,
+      final BlockPos targetPos, final Direction facing, boolean sneaking) {
     final FakePlayer fakePlayer = fakePlayerWeakReference.get();
     if (fakePlayer == null) {
       return ActionResultType.FAIL;
@@ -154,18 +159,25 @@ public abstract class TileEntityBase extends TileEntity implements IInventory {
     }
   }
 
-  public static ActionResultType rightClickBlock(WeakReference<FakePlayer> fakePlayer,
-      World world, BlockPos targetPos, Hand hand, Direction facing) throws Exception {
+  public static ActionResultType rightClickBlock(WeakReference<FakePlayer> fakePlayerWeakReference,
+                                                 World world, BlockPos targetPos, Hand hand, Direction facing) throws Exception {
+    return rightClickBlock(fakePlayerWeakReference, world, targetPos, hand, facing, false);
+  }
+
+  public static ActionResultType rightClickBlock(WeakReference<FakePlayer> fakePlayerWeakReference,
+      World world, BlockPos targetPos, Hand hand, Direction facing, boolean sneaking) throws Exception {
+    final FakePlayer fakePlayer = fakePlayerWeakReference.get();
     if (fakePlayer == null) {
       return ActionResultType.FAIL;
     }
-    Direction placementOn = (facing == null) ? fakePlayer.get().getAdjustedHorizontalFacing() : facing;
+    fakePlayer.setSneaking(sneaking);
+    Direction placementOn = (facing == null) ? fakePlayer.getAdjustedHorizontalFacing() : facing;
     BlockRayTraceResult blockraytraceresult = new BlockRayTraceResult(
-        fakePlayer.get().getLookVec(), placementOn,
+        fakePlayer.getLookVec(), placementOn,
         targetPos, true);
     //processRightClick
-    ActionResultType result = fakePlayer.get().interactionManager.func_219441_a(fakePlayer.get(), world,
-        fakePlayer.get().getHeldItem(hand), hand, blockraytraceresult);
+    ActionResultType result = fakePlayer.interactionManager.func_219441_a(fakePlayer, world,
+        fakePlayer.getHeldItem(hand), hand, blockraytraceresult);
     //it becomes CONSUME result 1 bucket. then later i guess it doesnt save, and then its water_bucket again
     return result;
   }

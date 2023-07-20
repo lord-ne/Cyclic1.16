@@ -54,6 +54,19 @@ public class ScreenUser extends ScreenBase<ContainerUser> {
         PacketRegistry.INSTANCE.sendToServer(new PacketTileData(TileUser.Fields.LEFTHAND.ordinal(), isChecked(), container.tile.getPos()));
       }
     });
+
+    //
+    x = guiLeft + 106;
+    y = guiTop + 59;
+    addButton(new CheckboxButton(x, y, h, h, new TranslationTextComponent("block.cyclic.user.sneak"), container.tile.isUsingSneak()) {
+
+      @Override
+      public void onPress() {
+        super.onPress();
+        container.tile.setUseSneak(isChecked());
+        PacketRegistry.INSTANCE.sendToServer(new PacketTileData(TileUser.Fields.SNEAK.ordinal(), isChecked(), container.tile.getPos()));
+      }
+    });
   }
 
   @Override

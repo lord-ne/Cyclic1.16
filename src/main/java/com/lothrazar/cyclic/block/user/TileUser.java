@@ -35,7 +35,7 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
   public static IntValue POWERCONF;
 
   static enum Fields {
-    REDSTONE, TIMER, TIMERDEL, RENDER, LEFTHAND;
+    REDSTONE, TIMER, TIMERDEL, RENDER, LEFTHAND, SNEAK;
   }
 
   ItemStackHandler inventory = new ItemStackHandler(1);
@@ -47,6 +47,7 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
   private int timerDelay = 20;
   static final int MAX = 640000;
   private boolean useLeftHand = false;
+  private boolean useSneak = false;
 
   public TileUser() {
     super(TileRegistry.user);
@@ -106,10 +107,10 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
       //end of SUPERHACK
       BlockPos target = this.pos.offset(this.getCurrentFacing());
       if (useLeftHand) {
-        TileEntityBase.leftClickBlock(fakePlayer, target, null);
+        TileEntityBase.leftClickBlock(fakePlayer, target, null, useSneak);
       }
       else {
-        TileEntityBase.rightClickBlock(fakePlayer, world, target, Hand.MAIN_HAND, null);
+        TileEntityBase.rightClickBlock(fakePlayer, world, target, Hand.MAIN_HAND, null, useSneak);
       }
       // ModCyclic.LOGGER.info(result + " user resut " + target + "; held = " + fakePlayer.get().getHeldItem(Hand.MAIN_HAND));
       TileEntityBase.syncEquippedItem(inventoryCap, fakePlayer, 0, Hand.MAIN_HAND);
@@ -126,6 +127,14 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
 
   public void setUseLeftHand(final boolean useLeftHand) {
     this.useLeftHand = useLeftHand;
+  }
+
+  public boolean isUsingSneak() {
+    return useSneak;
+  }
+
+  public void setUseSneak(final boolean useSneak) {
+    this.useSneak = useSneak;
   }
 
   @Override
@@ -146,6 +155,9 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
       case LEFTHAND:
         this.useLeftHand = value == 1;
       break;
+      case SNEAK:
+        this.useSneak = value == 1;
+      break;
     }
   }
 
@@ -162,6 +174,8 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
         return render;
       case LEFTHAND:
         return this.isUsingLeftHand() ? 1 : 0;
+      case SNEAK:
+        return this.isUsingSneak() ? 1 : 0;
     }
     return 0;
   }
@@ -193,6 +207,7 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
       uuid = tag.getUniqueId("uuid");
     }
     useLeftHand = tag.getBoolean("uselefthand");
+    useSneak = tag.getBoolean("useSneak");
     super.read(bs, tag);
   }
 
@@ -205,6 +220,7 @@ public class TileUser extends TileEntityBase implements ITickableTileEntity, INa
       tag.putUniqueId("uuid", uuid);
     }
     tag.putBoolean("uselefthand", useLeftHand);
+    tag.putBoolean("useSneak", useSneak);
     return super.write(tag);
   }
 
